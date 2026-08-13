@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waypoint · Thank You</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Report Received</h1>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'report' %}">Report Trail</a>
+            <a href="{% url 'search' %}">Search</a>
+        </nav>
+    </header>
+
+    <main class="card">
+        <h2>Thank you, {{ reporter_name }}!</h2>
+        <p>Your report for <strong>{{ trail_name }}</strong> has been recorded.</p>
+        {% if note %}
+            <blockquote style="border-left: 3px solid #27ae60; padding-left: 1rem; color: #555;">
+                "{{ note }}"
+            </blockquote>
+        {% endif %}
+        <p><a href="{% url 'home' %}">&larr; Back to Home</a></p>
+    </main>
+</body>
+</html>
