@@ -1,25 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waypoint · Home</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <header>
-        <h1>Waypoint</h1>
-        <nav>
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'report' %}">Report Trail</a>
-            <a href="{% url 'search' %}">Search</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <main class="card">
-        <h2>{{ greeting }}</h2>
-        <p>Your central platform for trail conditions, route planning, and community condition reports.</p>
-    </main>
-</body>
-</html>
+{% block title %}Waypoint · Home{% endblock %}
+
+{% block content %}
+    <h2>{{ greeting }}</h2>
+    <p>Your central platform for trail conditions, route planning, and community condition reports.</p>
+{% endblock %}
