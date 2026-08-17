@@ -47,7 +47,7 @@ This project is built as a practical web application using Django and SQLite, wi
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/GT-Codeur/waypoint-project.git
    cd waypoint
    ```
 
