@@ -1,5 +1,6 @@
 # trails/views.py
 from django.shortcuts import render
+from .models import Trail
 
 def home(request):
     context = {
@@ -35,53 +36,10 @@ def search(request):
 
 
 def catalog(request):
-    # Catalog dataset with at least 6 trail dicts
-    trails_list = [
-        {
-            "name": "Cascade Pass Trail",
-            "distance": 11.842,
-            "elevation": 540,
-            "difficulty": "Moderate",
-            "is_open": True,
-        },
-        {
-            "name": "Skyline Ridge Loop",
-            "distance": 8.5,
-            "elevation": 420,
-            "difficulty": "Easy",
-            "is_open": True,
-        },
-        {
-            "name": "Mount Rainier Pinnacle",
-            "distance": 14.375,
-            "elevation": 1250,
-            "difficulty": "Expert",
-            "is_open": True,
-        },
-        {
-            "name": "Wonderland Northern Arc",
-            "distance": 32.110,
-            "elevation": 2100,
-            "difficulty": "Expert",
-            "is_open": False,
-        },
-        {
-            "name": "Emerald Ridge Walk",
-            "distance": 5.2,
-            "elevation": 180,
-            "difficulty": "Easy",
-            "is_open": True,
-        },
-        {
-            "name": "Storm King Lookout",
-            "distance": 6.891,
-            "elevation": 630,
-            "difficulty": "Hard",
-            "is_open": False,
-        },
-    ]
+    # Fetch only open trails ordered by distance
+    open_trails = Trail.objects.filter(is_open=True).order_by('distance_km')
 
     context = {
-        "trails": trails_list,
+        "trails": open_trails,
     }
     return render(request, "catalog.html", context)
