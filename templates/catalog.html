@@ -4,70 +4,153 @@
 
 {% block extra_head %}
 <style>
-    .badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        color: white;
-        text-transform: uppercase;
+    .catalog-header {
+        margin-bottom: 1.5rem;
     }
-    .badge-open { background-color: #27ae60; }
-    .badge-hard { background-color: #e67e22; }
-    .badge-closed { background-color: #e74c3c; }
-    .badge-easy { background-color: #2980b9; }
-
-    table {
+    .filter-bar {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+    .filter-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    .filter-form select {
+        padding: 0.4rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        background-color: #ffffff;
+    }
+    .clear-link {
+        color: #64748b;
+        font-size: 0.875rem;
+        text-decoration: underline;
+    }
+    .catalog-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 1rem;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
     }
-    th, td {
+    .catalog-table th, 
+    .catalog-table td {
+        padding: 0.85rem 1rem;
         text-align: left;
-        padding: 0.75rem;
         border-bottom: 1px solid #e2e8f0;
     }
-    th {
+    .catalog-table th {
         background-color: #f1f5f9;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+    }
+    .catalog-table tr:last-child td {
+        border-bottom: none;
+    }
+    .catalog-table tr:hover td {
+        background-color: #f8fafc;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.2rem 0.55rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        color: #ffffff;
+        text-transform: uppercase;
+    }
+    .badge-easy { background-color: #2563eb; }
+    .badge-moderate { background-color: #0d9488; }
+    .badge-hard { background-color: #d97706; }
+    .badge-closed { background-color: #dc2626; }
+    .text-muted {
+        color: #94a3b8;
+        font-style: italic;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h2>Trail Catalog</h2>
-    <p>Explore curated trails and check live status updates.</p>
+    <div class="catalog-header">
+        <h2>Trail Catalog</h2>
+        <p>Explore curated trails, view distances, and filter by park region.</p>
+    </div>
 
-    <table>
+    <!-- Park Filter Form (WP-705) -->
+    <div class="filter-bar">
+        <form method="get" action="{% url 'catalog' %}" class="filter-form">
+            <label for="park-select"><strong>Filter by Park:</strong></label>
+            <select name="park" id="park-select" onchange="this.form.submit()">
+                <option value="">All Parks</option>
+                {% for park in parks %}
+                    <option value="{{ park.id }}" {% if selected_park_id == park.id|stringformat:"i" %}selected{% endif %}>
+                        {{ park.name }} ({{ park.region }})
+                    </option>
+                {% endfor %}
+            </select>
+            {% if selected_park_id %}
+                <a href="{% url 'catalog' %}" class="clear-link">Clear Filter</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Trail Listing Table -->
+    <table class="catalog-table">
         <thead>
             <tr>
-                <th>#</th>
+                <th style="width: 50px;">#</th>
                 <th>Trail Name</th>
+                <th>Park</th>
                 <th>Distance</th>
-                <th>Elevation Gain</th>
-                <th>Difficulty / Status</th>
+                <th>Elevation</th>
+                <th>Difficulty</th>
             </tr>
         </thead>
         <tbody>
             {% for trail in trails %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td><strong>{{ trail.name }}</strong></td>
-                    <td>{{ trail.distance|floatformat:1 }} km</td>
-                    <td>{{ trail.elevation }} m</td>
+                    <td>
+                        <a href="{% url 'trail_detail' pk=trail.pk %}">
+                            <strong>{{ trail.name }}</strong>
+                        </a>
+                    </td>
+                    <td>
+                        {% if trail.park %}
+                            {{ trail.park.name }}
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ trail.distance_km|floatformat:1 }} km</td>
+                    <td>{{ trail.elevation_gain }} m</td>
                     <td>
                         {% if not trail.is_open %}
                             <span class="badge badge-closed">CLOSED</span>
                         {% elif trail.difficulty == "Expert" or trail.difficulty == "Hard" %}
-                            <span class="badge badge-hard">HARD</span>
+                            <span class="badge badge-hard">{{ trail.difficulty|upper }}</span>
+                        {% elif trail.difficulty == "Easy" %}
+                            <span class="badge badge-easy">EASY</span>
                         {% else %}
-                            <span class="badge badge-easy">{{ trail.difficulty|upper }}</span>
+                            <span class="badge badge-moderate">{{ trail.difficulty|upper }}</span>
                         {% endif %}
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">No trails available in the catalog.</td>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                        No trails found matching the selected criteria.
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

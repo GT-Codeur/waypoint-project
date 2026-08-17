@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Waypoint · {{ trail.name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .detail-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1.25rem;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .detail-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .detail-title {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+        color: #0f172a;
+    }
+    .park-subtitle {
+        font-size: 1.05rem;
+        color: #475569;
+        margin: 0;
+    }
+    .status-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    .status-open {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+    .status-closed {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin: 1.75rem 0;
+    }
+    .meta-card {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.15rem 1rem;
+        text-align: center;
+    }
+    .meta-card.highlight {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+    }
+    .meta-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .meta-card.highlight .meta-value {
+        color: #1d4ed8;
+    }
+    .meta-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+    .siblings-section {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    .siblings-section h3 {
+        font-size: 1.2rem;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+    .siblings-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    .siblings-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .siblings-list li:last-child {
+        border-bottom: none;
+    }
+    .added-date {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'catalog' %}" class="back-link">&larr; Back to Catalog</a>
+
+    <div class="detail-header">
+        <h2 class="detail-title">{{ trail.name }}</h2>
+
+        {% if trail.park %}
+            <p class="park-subtitle">
+                Located in <strong>{{ trail.park.name }}</strong> &mdash; <em>{{ trail.park.region }}</em>
+            </p>
+        {% endif %}
+
+        {% if trail.is_open %}
+            <span class="status-pill status-open">&#9679; Trail Open</span>
+        {% else %}
+            <span class="status-pill status-closed">&#9679; Trail Closed</span>
+        {% endif %}
+    </div>
+
+    <!-- Metadata Grid -->
+    <div class="meta-grid">
+        <div class="meta-card">
+            <div class="meta-value">{{ trail.distance_km|floatformat:1 }} km</div>
+            <div class="meta-label">Distance</div>
+        </div>
+
+        <div class="meta-card">
+            <div class="meta-value">{{ trail.elevation_gain }} m</div>
+            <div class="meta-label">Elevation Gain</div>
+        </div>
+
+        <div class="meta-card">
+            <div class="meta-value">{{ trail.difficulty }}</div>
+            <div class="meta-label">Difficulty</div>
+        </div>
+
+        {% if estimated_time %}
+            <div class="meta-card highlight">
+                <div class="meta-value">{{ estimated_time }} hrs</div>
+                <div class="meta-label">Est. Hiking Time</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Cross-Relation: Sibling Trails in Same Park -->
+    {% if sibling_trails %}
+        <div class="siblings-section">
+            <h3>Other Trails in {{ trail.park.name }}</h3>
+            <ul class="siblings-list">
+                {% for sibling in sibling_trails %}
+                    <li>
+                        <a href="{% url 'trail_detail' pk=sibling.pk %}">
+                            <strong>{{ sibling.name }}</strong>
+                        </a>
+                        &mdash; {{ sibling.distance_km|floatformat:1 }} km | {{ sibling.difficulty }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="added-date">
+        Catalog entry added on {{ trail.added|date:"F j, Y" }}
+    </div>
+</div>
+{% endblock %}
