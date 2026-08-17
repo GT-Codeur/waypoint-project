@@ -48,7 +48,7 @@ This project is built as a practical web application using Django and SQLite, wi
 
    ```bash
    git clone https://github.com/GT-Codeur/waypoint-project.git
-   cd waypoint
+   cd waypoint-project
    ```
 
 2. Create and activate a virtual environment:
